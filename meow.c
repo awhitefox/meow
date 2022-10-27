@@ -119,22 +119,20 @@ int main() {
     signal(SIGINT, handle_sigint);
 
     int tw = -1, th = -1;
-    int dw = 0, dh = 0;
-    while (1) {
-        if (get_terminal_size(&tw, &th))
+    for (int i = 0; ; i = (i + 1) % frame_count)
+    {
+        time_t t1 = time(NULL);
+
+        if (i == 0 && get_terminal_size(&tw, &th))
         {
             ansi(CLEAR);
             ansi(CUR_HIDE);
             set_offsets(tw, th);
         }
+        fwrite(frames + i * frame_len, frame_len, 1, stdout);
 
-        for (int i = 0; i < frame_count; i++)
-        {
-            time_t t1 = time(NULL);
-            fwrite(frames + i * frame_len, frame_len, 1, stdout);
-            time_t t2 = time(NULL);
-            usleep((FRAME_MS - (t2 - t1)) * 1000);
-        }
+        time_t t2 = time(NULL);
+        usleep((FRAME_MS - (t2 - t1)) * 1000);
     }
     return 0;
 }
